@@ -1,0 +1,88 @@
+{
+  "name": "dr-mike",
+  "version": "0.0.0",
+  "description": "Opinionated, composable ESLint, TypeScript, and Vitest configuration presets",
+  "keywords": [
+    "eslint",
+    "eslint-config",
+    "tsconfig",
+    "typescript",
+    "vitest",
+    "config"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pcollinsonline/dr-mike.git"
+  },
+  "bugs": {
+    "url": "https://github.com/pcollinsonline/dr-mike/issues"
+  },
+  "homepage": "https://github.com/pcollinsonline/dr-mike#readme",
+  "exports": {
+    "./eslint": "./eslint/node.js",
+    "./eslint/svelte": "./eslint/svelte.js",
+    "./tsconfig/base": "./tsconfig/base.json",
+    "./tsconfig/node": "./tsconfig/node.json",
+    "./tsconfig/node-effect": "./tsconfig/node-effect.json",
+    "./tsconfig/svelte": "./tsconfig/svelte.json",
+    "./vitest": "./vitest/index.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "eslint",
+    "tsconfig",
+    "vitest"
+  ],
+  "scripts": {
+    "changeset": "changeset",
+    "version": "changeset version",
+    "release": "changeset publish"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "dependencies": {
+    "@eslint/compat": "^2.0.0",
+    "@eslint/js": "^10.0.0",
+    "eslint-config-prettier": "^10.0.0",
+    "eslint-import-resolver-typescript": "^4.0.0",
+    "eslint-plugin-eslint-comments": "^3.2.0",
+    "eslint-plugin-import": "^2.30.0",
+    "eslint-plugin-perfectionist": "^5.0.0",
+    "eslint-plugin-prefer-arrow": "^1.2.0",
+    "eslint-plugin-promise": "^7.0.0",
+    "eslint-plugin-unicorn": "^64.0.0",
+    "globals": "^17.0.0",
+    "typescript-eslint": "^8.0.0"
+  },
+  "peerDependencies": {
+    "@codeforbreakfast/eslint-effect": ">=0.8.0",
+    "@effect/language-service": ">=0.85.0",
+    "@vitest/coverage-v8": ">=2.0.0",
+    "@vitest/eslint-plugin": ">=1.0.0",
+    "eslint": ">=9.0.0",
+    "eslint-plugin-svelte": ">=3.0.0",
+    "eslint-plugin-turbo": ">=2.0.0",
+    "typescript": ">=5.0.0",
+    "vitest": ">=2.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@codeforbreakfast/eslint-effect": { "optional": true },
+    "@effect/language-service": { "optional": true },
+    "@vitest/coverage-v8": { "optional": true },
+    "@vitest/eslint-plugin": { "optional": true },
+    "eslint-plugin-svelte": { "optional": true },
+    "eslint-plugin-turbo": { "optional": true },
+    "typescript": { "optional": true },
+    "vitest": { "optional": true }
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.27.0"
+  }
+}

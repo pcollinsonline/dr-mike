@@ -1,0 +1,8 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "dr-mike Node 22 + ESM + Strictest + Effect language service",
+  "extends": "./node.json",
+  "compilerOptions": {
+    "plugins": [{ "name": "@effect/language-service" }]
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "dr-mike Svelte / SvelteKit + ESM + Strictest",
+  "extends": "./base.json",
+  "compilerOptions": {
+    "target": "ESNext",
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "exactOptionalPropertyTypes": false
+  },
+  "include": ["${configDir}/src/**/*.ts", "${configDir}/src/**/*.svelte"]
+}

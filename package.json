@@ -1,6 +1,6 @@
 {
   "name": "dr-mike",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Opinionated, composable ESLint, TypeScript, and Vitest configuration presets",
   "keywords": [
     "eslint",
@@ -74,14 +74,30 @@
     "vitest": ">=2.0.0"
   },
   "peerDependenciesMeta": {
-    "@codeforbreakfast/eslint-effect": { "optional": true },
-    "@effect/language-service": { "optional": true },
-    "@vitest/coverage-v8": { "optional": true },
-    "@vitest/eslint-plugin": { "optional": true },
-    "eslint-plugin-svelte": { "optional": true },
-    "eslint-plugin-turbo": { "optional": true },
-    "typescript": { "optional": true },
-    "vitest": { "optional": true }
+    "@codeforbreakfast/eslint-effect": {
+      "optional": true
+    },
+    "@effect/language-service": {
+      "optional": true
+    },
+    "@vitest/coverage-v8": {
+      "optional": true
+    },
+    "@vitest/eslint-plugin": {
+      "optional": true
+    },
+    "eslint-plugin-svelte": {
+      "optional": true
+    },
+    "eslint-plugin-turbo": {
+      "optional": true
+    },
+    "typescript": {
+      "optional": true
+    },
+    "vitest": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.0"

@@ -37,7 +37,7 @@
   ],
   "scripts": {
     "changeset": "changeset",
-    "version": "changeset version",
+    "version-packages": "changeset version",
     "release": "changeset publish"
   },
   "engines": {

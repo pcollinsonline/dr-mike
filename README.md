@@ -55,6 +55,15 @@ export default [
 
 Requires `pnpm add -D eslint-plugin-svelte`.
 
+### Monorepos
+
+dr-mike's preset allows root-level `*.config.{ts,mts,cts}` files (e.g. `vitest.config.ts`) to be linted without expanding your tsconfig `include`. The match is relative to typescript-eslint's `tsconfigRootDir`, which defaults to `process.cwd()`.
+
+For monorepos, this means:
+
+- **Per-package ESLint configs (recommended):** each package has its own `eslint.config.js` extending dr-mike, and lint runs per-package (e.g. via turbo). Config files in each package are picked up automatically. No extra setup.
+- **Single root ESLint config linting the whole repo:** the glob only matches root-level files; nested `packages/*/vitest.config.ts` won't be matched. Either run lint per-package, or add the nested config files to a tsconfig `include`.
+
 ### Extending
 
 ```js

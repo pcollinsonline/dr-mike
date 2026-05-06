@@ -11,7 +11,9 @@ export const typescriptConfig = ({ extraFileExtensions = [] } = {}) =>
     languageOptions: {
       parserOptions: {
         extraFileExtensions,
-        projectService: true,
+        projectService: {
+          allowDefaultProject: ['*.config.{ts,mts,cts}', '*.config.*.{ts,mts,cts}'],
+        },
       },
     },
     rules: {

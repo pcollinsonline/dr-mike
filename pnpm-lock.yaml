@@ -9,10 +9,10 @@ importers:
   .:
     dependencies:
       '@codeforbreakfast/eslint-effect':
-        specifier: '>=0.8.0'
+        specifier: 0.8.5
         version: 0.8.5(eslint@10.3.0)
       '@effect/language-service':
-        specifier: '>=0.85.0'
+        specifier: 0.85.1
         version: 0.85.1
       '@eslint/compat':
         specifier: ^2.0.0
@@ -21,13 +21,13 @@ importers:
         specifier: ^10.0.0
         version: 10.0.1(eslint@10.3.0)
       '@vitest/coverage-v8':
-        specifier: '>=2.0.0'
+        specifier: 4.1.5
         version: 4.1.5(vitest@4.1.5)
       '@vitest/eslint-plugin':
-        specifier: '>=1.0.0'
+        specifier: 1.6.16
         version: 1.6.16(@typescript-eslint/eslint-plugin@8.59.2(@typescript-eslint/parser@8.59.2(eslint@10.3.0)(typescript@6.0.3))(eslint@10.3.0)(typescript@6.0.3))(eslint@10.3.0)(typescript@6.0.3)(vitest@4.1.5)
       eslint:
-        specifier: '>=10.0.0'
+        specifier: 10.3.0
         version: 10.3.0
       eslint-config-prettier:
         specifier: ^10.0.0
@@ -51,10 +51,10 @@ importers:
         specifier: ^7.0.0
         version: 7.3.0(eslint@10.3.0)
       eslint-plugin-svelte:
-        specifier: '>=3.0.0'
+        specifier: 3.17.1
         version: 3.17.1(eslint@10.3.0)
       eslint-plugin-turbo:
-        specifier: '>=2.0.0'
+        specifier: 2.9.9
         version: 2.9.9(eslint@10.3.0)(turbo@2.9.9)
       eslint-plugin-unicorn:
         specifier: ^64.0.0
@@ -63,13 +63,13 @@ importers:
         specifier: ^17.0.0
         version: 17.6.0
       typescript:
-        specifier: '>=5.0.0'
+        specifier: 6.0.3
         version: 6.0.3
       typescript-eslint:
         specifier: ^8.0.0
         version: 8.59.2(eslint@10.3.0)(typescript@6.0.3)
       vitest:
-        specifier: '>=2.0.0'
+        specifier: 4.1.5
         version: 4.1.5(@vitest/coverage-v8@4.1.5)(vite@8.0.10)
     devDependencies:
       '@changesets/cli':

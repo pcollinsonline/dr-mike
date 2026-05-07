@@ -1,11 +1,10 @@
+import plugin from 'eslint-plugin-svelte'
 import { config, parser } from 'typescript-eslint'
 
-import { requirePeer } from '../_lib/require-peer.js'
 import { typescriptConfig } from './typescript.js'
 
-export default async () => {
-  const { default: plugin } = await requirePeer('eslint-plugin-svelte', 'svelte')
-  return config(
+export default () =>
+  config(
     ...plugin.configs.recommended,
     {
       extends: [typescriptConfig({ extraFileExtensions: ['.svelte'] })],
@@ -27,4 +26,3 @@ export default async () => {
     },
     ...plugin.configs.prettier,
   )
-}

@@ -4,40 +4,31 @@ import { config } from 'typescript-eslint'
 
 import { resolveGitignore } from './_lib/resolve-gitignore.js'
 import baseConfig from './shared/base.js'
+import effectConfig from './shared/plugins/effect.js'
+import { perfectionistConfig } from './shared/plugins/perfectionist.js'
 import globalIgnoresConfig from './shared/global-ignores.js'
 import javascriptConfig from './shared/javascript.js'
-import { perfectionistConfig } from './shared/plugins/perfectionist.js'
 import prettierConfig from './shared/prettier.js'
-import svelteFactory from './shared/svelte.js'
+import svelteConfig from './shared/svelte.js'
+import turborepoConfig from './shared/turborepo.js'
 import { typescriptConfig } from './shared/typescript.js'
+import vitestConfig from './shared/vitest.js'
 
 const { browser, nodeBuiltin } = globals
 
-const svelte = async ({
+const svelte = ({
   gitignore = true,
   internalPattern = [],
   turborepo = false,
-  vitest = true,
+  vitest = false,
   effect = false,
 } = {}) => {
   const optional = []
 
-  if (turborepo) {
-    const { default: turborepoFactory } = await import('./shared/turborepo.js')
-    optional.push(...(await turborepoFactory()))
-  }
+  if (turborepo) optional.push(...turborepoConfig())
+  if (vitest) optional.push(...vitestConfig())
+  if (effect) optional.push(...effectConfig())
 
-  if (vitest) {
-    const { default: vitestFactory } = await import('./shared/vitest.js')
-    optional.push(...(await vitestFactory()))
-  }
-
-  if (effect) {
-    const { default: effectFactory } = await import('./shared/plugins/effect.js')
-    optional.push(...(await effectFactory()))
-  }
-
-  const svelteConfig = await svelteFactory()
   const gitignorePath = resolveGitignore(gitignore)
 
   return config(
@@ -45,7 +36,7 @@ const svelte = async ({
     javascriptConfig,
     typescriptConfig({ extraFileExtensions: ['.svelte'] }),
     perfectionistConfig({ internalPattern }),
-    ...svelteConfig,
+    ...svelteConfig(),
     ...optional,
     baseConfig,
     prettierConfig,

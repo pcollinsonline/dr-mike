@@ -8,7 +8,9 @@ Opinionated, composable ESLint, TypeScript, and Vitest configuration presets. On
 pnpm add -D dr-mike
 ```
 
-You always need `eslint` installed in the consumer project. Other peers (svelte, turbo, vitest, effect) are only required if you opt into their features — see the per-feature sections below.
+That's it. `dr-mike` bundles every plugin and tool it needs — `eslint`, `typescript`, `vitest`, the rule plugins, the language services — at the exact versions it was tested with. You don't need to install anything else.
+
+If you want to use a different version of `eslint`, `typescript`, or `vitest`, install your own copy and pnpm will hoist it; `dr-mike`'s pinned copies just become the fallback.
 
 ## ESLint
 
@@ -16,24 +18,35 @@ You always need `eslint` installed in the consumer project. Other peers (svelte,
 // eslint.config.js
 import drMike from 'dr-mike/eslint'
 
-export default await drMike()
+export default drMike()
 ```
 
-The default export is an **async factory**. Use `await` at the top level (ESLint 9+ flat config supports it).
+The default export is a **synchronous factory**. No `await` required.
 
 ### Options
 
 ```js
-export default await drMike({
+export default drMike({
   gitignore: true,        // bool | string. true = auto-detect ./.gitignore. string = absolute path. false = disable.
   internalPattern: [],    // string[] — perfectionist sort-imports "internal" group regex(es). Default: []
-  turborepo: false,       // adds eslint-plugin-turbo. Requires `pnpm add -D eslint-plugin-turbo`
-  vitest: true,           // adds @vitest/eslint-plugin rules to **/*.test.ts. Requires `pnpm add -D @vitest/eslint-plugin`
-  effect: false,          // adds @codeforbreakfast/eslint-effect rules. Requires `pnpm add -D @codeforbreakfast/eslint-effect`
+  turborepo: false,       // adds eslint-plugin-turbo
+  vitest: false,          // adds @vitest/eslint-plugin rules to **/*.test.ts
+  effect: false,          // adds @codeforbreakfast/eslint-effect rules
 })
 ```
 
-If you opt into a feature without installing its peer dependency, dr-mike throws a clear error telling you what to install.
+All optional features default to `false`. Flip them on as needed — every plugin is already installed.
+
+### Batteries-included preset
+
+If you want everything turned on, skip the factory call:
+
+```js
+// eslint.config.js
+export { default } from 'dr-mike/eslint/full'
+```
+
+This is equivalent to `drMike({ turborepo: true, vitest: true, effect: true })`.
 
 ### Svelte profile
 
@@ -43,7 +56,7 @@ import drMike from 'dr-mike/eslint/svelte'
 import svelteConfig from './svelte.config.js'
 
 export default [
-  ...(await drMike()),
+  ...drMike(),
   {
     files: ['**/*.svelte', '**/*.svelte.ts'],
     languageOptions: {
@@ -53,7 +66,7 @@ export default [
 ]
 ```
 
-Requires `pnpm add -D eslint-plugin-svelte`.
+The `svelte` profile relies on `svelte` being present in your project — which it always is for a Svelte codebase, so no extra install is needed.
 
 ### Monorepos
 
@@ -68,7 +81,7 @@ For monorepos, this means:
 
 ```js
 export default [
-  ...(await drMike({ turborepo: true })),
+  ...drMike({ turborepo: true }),
   {
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
@@ -93,10 +106,10 @@ Available presets:
 |---|---|
 | `dr-mike/tsconfig/base` | The strictest base. Extend if you need a custom target/module. |
 | `dr-mike/tsconfig/node` | Node 22+, `NodeNext` modules, `ES2023` lib. |
-| `dr-mike/tsconfig/node-effect` | Same as `node` plus `@effect/language-service` plugin. Requires `pnpm add -D @effect/language-service`. |
+| `dr-mike/tsconfig/node-effect` | Same as `node` plus `@effect/language-service` plugin. |
 | `dr-mike/tsconfig/svelte` | Svelte/SvelteKit, `Bundler` resolution, DOM lib. |
 
-Peer requirement: `pnpm add -D typescript`.
+`typescript` ships with `dr-mike` at the version it's tested against. To use a different version, install your own — pnpm will hoist it. Note that `typescript-eslint` has a tight TS compatibility window; very old (pre-5.0) or future major versions may not parse cleanly.
 
 ## Vitest
 
@@ -113,8 +126,6 @@ export default mergeConfig(
 ```
 
 Defaults: `src/**/*.test.ts`, globals on, V8 coverage on, HTML/JSON/text reporters.
-
-Peers: `pnpm add -D vitest @vitest/coverage-v8`.
 
 ## Versioning & releases
 

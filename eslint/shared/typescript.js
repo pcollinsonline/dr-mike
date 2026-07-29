@@ -35,6 +35,7 @@ export const typescriptConfig = ({ extraFileExtensions = [] } = {}) =>
       '@typescript-eslint/no-non-null-assertion': 'error',
       '@typescript-eslint/no-shadow': 'error',
       '@typescript-eslint/no-require-imports': 'error',
+      '@typescript-eslint/no-unsafe-type-assertion': 'error',
       '@typescript-eslint/no-unused-vars': [
         'error',
         {

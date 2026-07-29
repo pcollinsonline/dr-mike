@@ -12,13 +12,24 @@ A core design choice: every plugin/tool the presets need (`eslint`, `typescript`
 
 ```sh
 pnpm install                # install (pnpm@10.33.0; Node >=20)
+pnpm typecheck              # tsc --noEmit over the vitest preset (CI runs this)
 pnpm pack --dry-run         # mirrors the CI smoke check — verifies what gets published
 pnpm changeset              # author a changeset before opening a PR
 pnpm version-packages       # consumes changesets, bumps version (run by release bot)
 pnpm release                # changesets publish (run by release bot)
 ```
 
-There are no `build`, `lint`, or `test` scripts — don't add them unless you're adding actual source/tests. To smoke-test a config change locally, point a sibling project's `eslint.config.js` / `tsconfig.json` / `vitest.config.js` at the working tree (e.g. `pnpm link` or a `file:` dependency).
+`pnpm typecheck` is the package's only automated check. It runs against `tsconfig.check.json`, which is dev-only (not in `files`, so it isn't published) and turns on `allowJs`/`checkJs` over `vitest/index.js` and `vitest/types.d.ts`. The `.check.` name is deliberate — it keeps this config from being confused with the consumer-facing presets in `tsconfig/`. Three details in it are load-bearing — all three were verified by deliberately breaking them:
+
+- **`vitest/index.js` carries `// @ts-check`, and the declaration file is `types.d.ts`, not `index.d.ts`.** A sibling `index.d.ts` shadows `index.js`, so TypeScript checks the declaration instead of the source and the whole guard silently stops working. Don't rename it back.
+- **`skipLibCheck: false`.** `tsconfig/base.json` sets it `true` (correct for consumers), but with it on, a bad type reference *inside* `vitest/types.d.ts` is suppressed and ships. This is not hypothetical — it hid a wrong type name during this file's own development.
+- **`lib: ["ES2023", "DOM"]` plus the `@types/node` devDependency.** Only needed to keep vite's and vitest's own `.d.ts` files quiet once lib checking is on. Neither affects the published presets.
+
+The payoff: options removed from Vitest fail the build instead of being silently ignored — which is exactly how `coverage.all` survived unnoticed after Vitest 4 dropped it.
+
+Note that `vitest/config` exports the config type as **`ViteUserConfig`**, not `UserConfig`.
+
+There are no `build`, `lint`, or `test` scripts — don't add them unless you're adding actual source/tests. To smoke-test a config change locally, point a sibling project's `eslint.config.js` / `tsconfig.json` / `vitest.config.js` at the working tree (e.g. `pnpm link` or a `file:` dependency). `/Users/ic9r/Documents/projects/a50/thoth-notebook` is a real consumer that exercises the Svelte profile.
 
 ## Architecture
 
@@ -49,9 +60,11 @@ The `typescript` block sets `parserOptions.projectService.allowDefaultProject: [
 
 Plain JSON files, one per preset. `base.json` is the strictest baseline (no `include` of its own). `node.json` and `svelte.json` extend `base.json`; `node-effect.json` extends **`node.json`** (not `base.json`) and only adds the `@effect/language-service` compiler plugin. They use the `${configDir}` token (TS 5.5+) in `outDir`/`include` so paths resolve relative to the **consumer's** tsconfig, not this package — preserve that when editing.
 
+The presets are verified TypeScript 7 compatible, but dr-mike deliberately bundles TypeScript **6**, and that is not drift to "fix". `typescript-eslint` declares `typescript: ">=4.8.4 <6.1.0"` and cannot run against TS 7, whose package exports a version stub instead of the compiler JS API. Upstream solves this in its monorepo with an npm alias pair (`"@typescript/native": "npm:typescript@7.0.2"` + `"typescript": "npm:@typescript/typescript6@6.0.2"`), which works there only because `publicHoistPattern` puts `tsc` on PATH. dr-mike is a published package with no equivalent lever — under pnpm its deps are nested, so a bundled TS 7 `tsc` would be unreachable to consumers while adding ~30 MB per install. Consumers who want TS 7 install it themselves as a direct dep.
+
 ### Vitest (`vitest/`)
 
-`vitest/index.js` exports a default shared config and re-exports `defineConfig` / `mergeConfig` from `vitest/config`. Consumers compose via `mergeConfig(sharedConfig, defineConfig({...}))`. `vitest/index.d.ts` provides the types.
+`vitest/index.js` exports a default shared config and re-exports `defineConfig` / `mergeConfig` from `vitest/config`. Consumers compose via `mergeConfig(sharedConfig, defineConfig({...}))`. `vitest/types.d.ts` provides the types and is wired up through the `"types"` condition on the `./vitest` export — the default export is typed as `ViteUserConfig`, so a bare string export would leave it untyped for consumers on `node16`/`bundler` resolution.
 
 ## Releases
 

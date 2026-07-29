@@ -1,0 +1,18 @@
+{
+  // Dev-only, not published (absent from package.json `files`). Named
+  // tsconfig.check.json rather than tsconfig.json so it is never mistaken for
+  // one of the consumer-facing presets in tsconfig/. Run via `pnpm typecheck`.
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "./tsconfig/node.json",
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": true,
+    // skipLibCheck must stay OFF here (base.json turns it on for consumers).
+    // With it on, a bad type reference inside vitest/types.d.ts is suppressed
+    // entirely and ships silently. DOM lib + @types/node are only needed to keep
+    // vite's and vitest's own .d.ts files quiet once lib checking is enabled.
+    "skipLibCheck": false,
+    "lib": ["ES2023", "DOM"]
+  },
+  "include": ["vitest/index.js", "vitest/types.d.ts"]
+}

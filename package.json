@@ -28,7 +28,10 @@
     "./tsconfig/node": "./tsconfig/node.json",
     "./tsconfig/node-effect": "./tsconfig/node-effect.json",
     "./tsconfig/svelte": "./tsconfig/svelte.json",
-    "./vitest": "./vitest/index.js",
+    "./vitest": {
+      "types": "./vitest/types.d.ts",
+      "default": "./vitest/index.js"
+    },
     "./package.json": "./package.json"
   },
   "files": [
@@ -38,6 +41,7 @@
   ],
   "scripts": {
     "changeset": "changeset",
+    "typecheck": "tsc --noEmit -p tsconfig.check.json",
     "version-packages": "changeset version",
     "release": "changeset publish"
   },
@@ -73,6 +77,7 @@
     "vitest": "4.1.10"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.31.1"
+    "@changesets/cli": "^2.31.1",
+    "@types/node": "^26.1.2"
   }
 }

@@ -44,12 +44,18 @@ export const perfectionistConfig = ({ internalPattern = [] } = {}) =>
       'perfectionist/sort-imports': [
         'error',
         {
+          customGroups: [
+            { elementNamePattern: [String.raw`^\$lib/.*`], groupName: 'ts-paths' },
+            { elementNamePattern: [String.raw`^\#lib/.*`], groupName: 'ts-paths2' },
+          ],
           environment: 'node',
           groups: [
             'type-import',
             ['value-builtin', 'value-external'],
             'type-internal',
             'value-internal',
+            'ts-paths',
+            'ts-paths2',
             'type-parent',
             'type-sibling',
             'type-index',

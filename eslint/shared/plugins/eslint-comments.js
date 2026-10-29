@@ -1,15 +1,10 @@
-import { fixupPluginRules } from '@eslint/compat'
-import plugin from 'eslint-plugin-eslint-comments'
+import plugin from '@eslint-community/eslint-plugin-eslint-comments/configs'
 import { config } from 'typescript-eslint'
 
-export default config({
+export default config(plugin.recommended, {
   name: 'dr-mike:eslint-comments',
 
-  plugins: {
-    'eslint-comments': fixupPluginRules(plugin),
-  },
   rules: {
-    ...plugin.configs.recommended.rules,
-    'eslint-comments/require-description': 'error',
+    '@eslint-community/eslint-comments/require-description': 'error',
   },
 })

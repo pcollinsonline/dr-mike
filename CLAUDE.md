@@ -6,12 +6,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 `dr-mike` is a single npm package that ships **opinionated config presets** for ESLint, TypeScript, and Vitest via subpath exports in three families (`dr-mike/eslint*`, `dr-mike/tsconfig/*`, `dr-mike/vitest`). There is **no `src/`, no build step, and no test suite** — files in `eslint/`, `tsconfig/`, and `vitest/` are published as-is (see `package.json` `files` and `exports`).
 
-A core design choice: every plugin/tool the presets need (`eslint`, `typescript`, `vitest`, every rule plugin, language services) is a real `dependencies` entry, not a peer dep. Consumers install only `dr-mike`. If a consumer installs their own copy of `eslint`/`typescript`/`vitest`, pnpm hoists theirs and dr-mike's pinned copy becomes the fallback.
+A core design choice: every plugin/tool the presets need (`eslint`, `typescript`, `vitest`, `vite` — a required peer of Vitest 5 — every rule plugin, language services) is a real `dependencies` entry, not a peer dep. Consumers install only `dr-mike`. If a consumer installs their own copy of `eslint`/`typescript`/`vitest`, pnpm hoists theirs and dr-mike's pinned copy becomes the fallback.
+
+The same rule covers **peers of our own dependencies**: anything a bundled plugin declares as a peer must also be a direct dependency, or pnpm's auto-install-peers resolves it against the *consumer's* tree. `@typescript-eslint/eslint-plugin` (peer of `@vitest/eslint-plugin`) and `@typescript-eslint/parser` (optional peer of `eslint-plugin-import`) are direct deps for exactly this reason — without them, a consumer with `typescript@7` installed got ESLint crashing on "typescript-eslint does not support TS 7.0". Keep their range in step with `typescript-eslint`.
 
 ## Commands
 
 ```sh
-pnpm install                # install (pnpm@10.33.0; Node >=20)
+pnpm install                # install (pnpm@10.33.0; Node ^22.13 || ^24 || >=26)
 pnpm typecheck              # tsc --noEmit over the vitest preset (CI runs this)
 pnpm pack --dry-run         # mirrors the CI smoke check — verifies what gets published
 pnpm changeset              # author a changeset before opening a PR
@@ -56,15 +58,19 @@ Directory layout under `eslint/`:
 
 The `typescript` block sets `parserOptions.projectService.allowDefaultProject: ['*.config.{ts,mts,cts}', '*.config.*.{ts,mts,cts}']` so root-level config files (e.g. `vitest.config.ts`) lint without being added to a tsconfig `include`. The glob is relative to typescript-eslint's `tsconfigRootDir` (defaults to `process.cwd()`), so it does **not** match nested `packages/*/vitest.config.ts` — the README "Monorepos" section explains the consequence.
 
+When mirroring upstream's `unicorn.js`, leave out its `unicorn/no-top-level-side-effects` `allow` map. In unicorn 79 that option is only read when `checkUnknownCalls: true`, which upstream doesn't set, so the map does nothing. Turning `checkUnknownCalls` on would flag every top-level `Schema.Struct(...)`-style call in consumers.
+
 ### TypeScript (`tsconfig/`)
 
 Plain JSON files, one per preset. `base.json` is the strictest baseline (no `include` of its own). `node.json` and `svelte.json` extend `base.json`; `node-effect.json` extends **`node.json`** (not `base.json`) and only adds the `@effect/language-service` compiler plugin. They use the `${configDir}` token (TS 5.5+) in `outDir`/`include` so paths resolve relative to the **consumer's** tsconfig, not this package — preserve that when editing.
 
 The presets are verified TypeScript 7 compatible, but dr-mike deliberately bundles TypeScript **6**, and that is not drift to "fix". `typescript-eslint` declares `typescript: ">=4.8.4 <6.1.0"` and cannot run against TS 7, whose package exports a version stub instead of the compiler JS API. Upstream solves this in its monorepo with an npm alias pair (`"@typescript/native": "npm:typescript@7.0.2"` + `"typescript": "npm:@typescript/typescript6@6.0.2"`), which works there only because `publicHoistPattern` puts `tsc` on PATH. dr-mike is a published package with no equivalent lever — under pnpm its deps are nested, so a bundled TS 7 `tsc` would be unreachable to consumers while adding ~30 MB per install. Consumers who want TS 7 install it themselves as a direct dep.
 
+`node.json` sets `allowImportingTsExtensions` + `rewriteRelativeImportExtensions` (mirrored from upstream) so consumers can write `./foo.ts` specifiers for Node's native type stripping; `svelte.json` deliberately does not (bundler resolution handles extensions).
+
 ### Vitest (`vitest/`)
 
-`vitest/index.js` exports a default shared config and re-exports `defineConfig` / `mergeConfig` from `vitest/config`. Consumers compose via `mergeConfig(sharedConfig, defineConfig({...}))`. `vitest/types.d.ts` provides the types and is wired up through the `"types"` condition on the `./vitest` export — the default export is typed as `ViteUserConfig`, so a bare string export would leave it untyped for consumers on `node16`/`bundler` resolution.
+`vitest/index.js` exports the shared config as the default export, a `defineTestConfig(packageJson, overrides?)` factory (mirrors upstream's `@toolchain/vitest`: sets `test.name` from the package name, merges `overrides` last), and re-exports `defineConfig` / `mergeConfig` from `vitest/config`. Keep the default export — existing consumers compose via `mergeConfig(sharedConfig, defineConfig({...}))`. `types.d.ts` is hand-written, so when you change an export in `index.js`, update it too: the typecheck checks each file on its own, not that they agree. `vitest/types.d.ts` provides the types and is wired up through the `"types"` condition on the `./vitest` export — the default export is typed as `ViteUserConfig`, so a bare string export would leave it untyped for consumers on `node16`/`bundler` resolution.
 
 ## Releases
 

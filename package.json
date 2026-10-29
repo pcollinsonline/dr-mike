@@ -1,6 +1,6 @@
 {
   "name": "dr-mike",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Opinionated, composable ESLint, TypeScript, and Vitest configuration presets",
   "keywords": [
     "eslint",

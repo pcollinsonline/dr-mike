@@ -13,7 +13,7 @@ The same rule covers **peers of our own dependencies**: anything a bundled plugi
 ## Commands
 
 ```sh
-pnpm install                # install (pnpm@10.33.0; Node ^22.13 || ^24 || >=26)
+pnpm install                # install (pnpm@12.16.1; Node ^22.13 || ^24 || >=26)
 pnpm typecheck              # tsc --noEmit over the vitest preset (CI runs this)
 pnpm pack --dry-run         # mirrors the CI smoke check — verifies what gets published
 pnpm changeset              # author a changeset before opening a PR
@@ -30,6 +30,8 @@ pnpm release                # changesets publish (run by release bot)
 The payoff: options removed from Vitest fail the build instead of being silently ignored — which is exactly how `coverage.all` survived unnoticed after Vitest 4 dropped it.
 
 Note that `vitest/config` exports the config type as **`ViteUserConfig`**, not `UserConfig`.
+
+pnpm settings for this repo live in `pnpm-workspace.yaml` (dev-only, not published): pnpm 11+ reads only auth and registry settings from `.npmrc`. It also lists `unrs-resolver` under `allowBuilds`, because pnpm 11+ fails an install on any build script it hasn't been told about. pnpm 11+ defaults `minimumReleaseAge` to one day, and `--frozen-lockfile` re-checks every lockfile entry against it, so a lockfile entry published less than a day ago fails CI. Resolve to an older version or wait. Don't lower the policy.
 
 There are no `build`, `lint`, or `test` scripts — don't add them unless you're adding actual source/tests. To smoke-test a config change locally, point a sibling project's `eslint.config.js` / `tsconfig.json` / `vitest.config.js` at the working tree (e.g. `pnpm link` or a `file:` dependency). `/Users/ic9r/Documents/projects/a50/thoth-notebook` is a real consumer that exercises the Svelte profile.
 
@@ -75,5 +77,7 @@ The presets are verified TypeScript 7 compatible, but dr-mike deliberately bundl
 ## Releases
 
 Changesets-driven. The `Release` workflow (`.github/workflows/release.yml`) runs on push to `main`: if changesets exist it opens/updates a "Version Packages" PR; merging that PR triggers `pnpm release` which publishes to npm with provenance via OIDC (hence `id-token: write` and Node 24 in that workflow — Node 22 in CI smoke is fine because it doesn't publish).
+
+Version pairing matters here. `@changesets/cli` 3 goes with `changesets/action@v2` (v1 is for cli 2), and v2 renamed the inputs to `version-script` / `publish-script`. `pnpm/action-setup` is pinned to `v6.1.0`, not `v6`: the floating `v6` tag predates its pnpm 12 support. `changeset publish` runs pnpm 12's native `pnpm publish`, which handles trusted publishing and provenance itself.
 
 Any user-facing change needs a `pnpm changeset` entry committed in the same PR.

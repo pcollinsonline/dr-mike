@@ -21,7 +21,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v5
+        uses: pnpm/action-setup@v6.1.0
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -34,9 +34,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Create Release Pull Request or Publish
-        uses: changesets/action@v1
+        uses: changesets/action@v2
         with:
-          publish: pnpm release
-          version: pnpm run version-packages
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          publish-script: pnpm release
+          version-script: pnpm run version-packages

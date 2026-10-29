@@ -1,0 +1,12 @@
+# Dev-only pnpm settings. Not published (absent from package.json `files`).
+# pnpm 11+ reads only auth and registry settings from .npmrc, so anything
+# else lives here.
+
+# pnpm's default, stated because the dependency design in CLAUDE.md relies on it.
+autoInstallPeers: true
+
+# pnpm 11+ fails an install on any build script not listed here.
+# unrs-resolver ships prebuilt binaries, so its postinstall stays off,
+# as it was under pnpm 10.
+allowBuilds:
+  unrs-resolver: false
